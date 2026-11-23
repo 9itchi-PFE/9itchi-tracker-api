@@ -1,6 +1,7 @@
 package services
 
 import (
+	"9itchi-tracker-api/core"
 	"9itchi-tracker-api/pkg/email"
 	"9itchi-tracker-api/repositories"
 	"9itchi-tracker-api/utils"
@@ -19,7 +20,7 @@ type Clients struct {
 
 func InitServices(config utils.AppConfig, repos *repositories.Repositories) *Services {
 	return &Services{
-		Tracking: NewTrackingService(repos.Tracking),
+		Tracking: NewTrackingService(repos.Tracking, core.LogPublisher{}, config.SecretKey),
 		Clients: &Clients{
 			Email: email.New(config.EmailAPIURL, config.InternalAPIKey),
 		},

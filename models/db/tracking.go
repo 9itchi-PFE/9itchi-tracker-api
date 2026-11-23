@@ -10,6 +10,7 @@ type TrackingRecord struct {
 	UserID      string     `db:"user_id" json:"user_id"`
 	SentAt      time.Time  `db:"sent_at" json:"sent_at"`
 	FirstOpenAt *time.Time `db:"first_open_at" json:"first_open_at"`
+	LastOpenAt  *time.Time `db:"last_open_at" json:"last_open_at"`
 	OpenCount   int        `db:"open_count" json:"open_count"`
 	CreatedAt   time.Time  `db:"created_at" json:"created_at"`
 	UpdatedAt   time.Time  `db:"updated_at" json:"updated_at"`

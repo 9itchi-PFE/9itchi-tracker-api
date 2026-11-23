@@ -10,15 +10,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// transparentGIF is a 1x1 transparent GIF89a.
+var transparentGIF = []byte{
+	0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0x01, 0x00, 0x01, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0xff, 0xff, 0xff, 0x21, 0xf9, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00, 0x2c, 0x00, 0x00, 0x00, 0x00,
+	0x01, 0x00, 0x01, 0x00, 0x00, 0x02, 0x02, 0x44, 0x01, 0x00, 0x3b,
+}
+
 // Pixel: GET /t/:trackingId (public) 1x1 transparent GIF, records the open.
+// Always 200 with the GIF, even for unknown IDs (never reveal existence).
 func Pixel(svc services.TrackingService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		result, apiErr := svc.Pixel(c.Request.Context(), c.Param("trackingId"))
-		if apiErr != nil {
-			models.FormatError(c, apiErr)
-			return
-		}
-		c.JSON(http.StatusOK, result)
+		svc.Pixel(c.Request.Context(), c.Param("trackingId"), c.Request.UserAgent(), c.ClientIP())
+		c.Header("Cache-Control", "no-store, no-cache, must-revalidate, private")
+		c.Data(http.StatusOK, "image/gif", transparentGIF)
 	}
 }
 
