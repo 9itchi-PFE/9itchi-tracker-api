@@ -1,0 +1,6 @@
+version: "2"
+linters:
+  exclusions:
+    # Unchecked Close/RemoveAll/print errors in defers and test helpers are accepted.
+    presets:
+      - std-error-handling
