@@ -20,7 +20,7 @@ type Clients struct {
 
 func InitServices(config utils.AppConfig, repos *repositories.Repositories) *Services {
 	return &Services{
-		Tracking: NewTrackingService(repos.Tracking, core.LogPublisher{}, config.SecretKey),
+		Tracking: NewTrackingService(repos.Tracking, core.NewPublisher(config.RabbitMQURL), config.SecretKey),
 		Clients: &Clients{
 			Email: email.New(config.EmailAPIURL, config.InternalAPIKey),
 		},
