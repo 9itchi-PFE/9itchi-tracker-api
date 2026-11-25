@@ -9,6 +9,8 @@ import (
 
 // Services holds service implementations and the peer clients they call.
 type Services struct {
+	// Erase removes what this service keeps about a deleted account.
+	Erase    EraseService
 	Tracking TrackingService
 	Clients  *Clients
 }
@@ -20,6 +22,7 @@ type Clients struct {
 
 func InitServices(config utils.AppConfig, repos *repositories.Repositories) *Services {
 	return &Services{
+		Erase:    NewEraseService(repos.Erase),
 		Tracking: NewTrackingService(repos.Tracking, core.NewPublisher(config.RabbitMQURL), config.SecretKey),
 		Clients: &Clients{
 			Email: email.New(config.EmailAPIURL, config.InternalAPIKey),
