@@ -74,7 +74,12 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Trigger deployment workflow
+  deploy:
+    name: Trigger deployment
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch service-built event
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.DISPATCH_TOKEN }}
@@ -86,6 +91,6 @@ jobs:
               client_payload: {
                 service: 'tracker-api',
                 version: '${{ github.sha }}',
-                image_url: '${{ env.REGISTRY }}/${{ steps.owner.outputs.owner_lower }}/${{ env.IMAGE_NAME }}:${{ github.sha }}'
+                image_url: 'ghcr.io/' + context.repo.owner.toLowerCase() + '/${{ env.IMAGE_NAME }}:${{ github.sha }}'
               }
             })
