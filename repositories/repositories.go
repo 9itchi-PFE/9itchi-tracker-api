@@ -10,6 +10,7 @@ import (
 type Repositories struct {
 	Store    *Store
 	Tracking TrackingRepository
+	Erase    EraseRepository
 }
 
 // InitRepositories connects to PostgreSQL, applies migrations and builds the repositories.
@@ -24,6 +25,7 @@ func InitRepositories(ctx context.Context, config utils.AppConfig) (*Repositorie
 	return &Repositories{
 		Store:    store,
 		Tracking: NewTrackingRepository(store),
+		Erase:    NewEraseRepository(store),
 	}, nil
 }
 

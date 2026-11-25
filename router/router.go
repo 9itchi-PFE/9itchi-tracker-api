@@ -38,6 +38,7 @@ func initializeRoutes(r *gin.Engine, services *services.Services) {
 	internalGroup := r.Group("/")
 	internalGroup.Use(InternalAPIKeyMiddleware())
 	{
+		internalGroup.DELETE("/internal/users/:id", handlers.EraseUser(services.Erase))
 		internalGroup.POST("/internal/tracking", handlers.RegisterTracking(services.Tracking))
 	}
 
