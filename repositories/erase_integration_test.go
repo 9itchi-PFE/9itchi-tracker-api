@@ -16,7 +16,7 @@ func TestEraseUser(t *testing.T) {
 	ctx := context.Background()
 	repo := NewEraseRepository(store)
 	const gone, kept = "00000000-0000-4000-8000-0000000000e1", "00000000-0000-4000-8000-0000000000e2"
-	const count = `SELECT (SELECT count(*) FROM tracking_records WHERE user_id = $1) + (SELECT count(*) FROM tracking_opens WHERE tracking_id = 'trk-' || $1::text)`
+	const count = `SELECT (SELECT count(*) FROM tracking_records WHERE user_id = $1::text::uuid) + (SELECT count(*) FROM tracking_opens WHERE tracking_id = 'trk-' || $1::text)`
 	left := func(id string) int {
 		var n int
 		require.NoError(t, store.Conn(ctx).QueryRow(ctx, count, id).Scan(&n))
@@ -24,7 +24,7 @@ func TestEraseUser(t *testing.T) {
 	}
 	for _, id := range []string{gone, kept} {
 		for _, q := range []string{
-			`WITH r AS (INSERT INTO tracking_records (tracking_id, email_id, user_id) VALUES ('trk-' || $1::text, gen_random_uuid(), $1) RETURNING tracking_id) INSERT INTO tracking_opens (tracking_id, ip_hash) SELECT tracking_id, repeat('a', 64) FROM r`,
+			`WITH r AS (INSERT INTO tracking_records (tracking_id, email_id, user_id) VALUES ('trk-' || $1::text, gen_random_uuid(), $1::text::uuid) RETURNING tracking_id) INSERT INTO tracking_opens (tracking_id, ip_hash) SELECT tracking_id, repeat('a', 64) FROM r`,
 		} {
 			_, err := store.Conn(ctx).Exec(ctx, q, id)
 			require.NoError(t, err, q)
