@@ -21,7 +21,7 @@ on:
       - '.github/workflows/build.yml'
   workflow_dispatch:
 
-# One build at a time on the home-server runner; a newer push to main replaces a queued or running one.
+# One build at a time; a newer push to main replaces a queued or running one.
 concurrency:
   group: build-main
   cancel-in-progress: true
@@ -33,7 +33,7 @@ env:
 jobs:
   build:
     name: Build and Push Docker Image
-    runs-on: [self-hosted, 9itchi]
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
@@ -73,7 +73,7 @@ jobs:
   deploy:
     name: Trigger deployment
     needs: build
-    runs-on: [self-hosted, 9itchi]
+    runs-on: ubuntu-latest
     steps:
       - name: Dispatch service-built event
         uses: actions/github-script@v7

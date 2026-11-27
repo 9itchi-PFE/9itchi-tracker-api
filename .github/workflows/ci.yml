@@ -7,10 +7,6 @@ on:
 permissions:
   contents: read
 
-# Home-server runner (4 CPU, 2.9 GB shared with production): compile 2 packages at a time.
-env:
-  GOFLAGS: -p=2
-
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -18,14 +14,12 @@ concurrency:
 jobs:
   test:
     name: Format, vet and tests
-    runs-on: [self-hosted, 9itchi]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-          # The self-hosted runner keeps its Go caches between runs.
-          cache: false
       - name: gofmt
         run: |
           unformatted=$(gofmt -l .)
@@ -33,21 +27,19 @@ jobs:
       - run: go vet ./...
       - run: go build ./...
       - name: Unit tests
-        run: go test ./...
+        run: go test $(command -v gcc >/dev/null && echo -race) ./...
       - name: Integration tests (embedded PostgreSQL)
         if: hashFiles('repositories/*_integration_test.go') != ''
         run: go test -tags integration ./repositories/...
 
   lint:
     name: golangci-lint
-    runs-on: [self-hosted, 9itchi]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-          # The self-hosted runner keeps its Go caches between runs.
-          cache: false
       - uses: golangci/golangci-lint-action@v8
         with:
           version: v2.15.0
