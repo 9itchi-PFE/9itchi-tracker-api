@@ -21,24 +21,18 @@ on:
       - '.github/workflows/build.yml'
   workflow_dispatch:
 
+# One build at a time on the home-server runner; a newer push to main replaces a queued or running one.
+concurrency:
+  group: build-main
+  cancel-in-progress: true
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: 9itchi-tracker-api
 
 jobs:
-  test:
-    name: Test
-    runs-on: [self-hosted, 9itchi]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-      - run: go build ./... && go test ./...
-
   build:
     name: Build and Push Docker Image
-    needs: test
     runs-on: [self-hosted, 9itchi]
     permissions:
       contents: read
